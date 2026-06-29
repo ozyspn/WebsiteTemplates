@@ -13,8 +13,8 @@
   'use strict';
 
   const PAGES = ['home', 'work', 'story', 'about', 'pricing', 'contact'];
-  // Nav items that get an active dot — story has no top-nav entry in the design.
-  const NAV_PAGES = ['work', 'story', 'about', 'pricing'];
+  // Nav items that get an active state. Story has no top-nav entry in the design.
+  const NAV_PAGES = ['home', 'work', 'story', 'about', 'pricing'];
   const DEFAULT = 'home';
 
   const pageEls = new Map();
@@ -68,21 +68,50 @@
 
   function titleCase(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+  // ---- mobile nav drawer ----
+  function openMenu() {
+    document.body.classList.add('nav-open');
+    const t = document.querySelector('.nav-toggle');
+    if (t) t.setAttribute('aria-expanded', 'true');
+  }
+  function closeMenu() {
+    document.body.classList.remove('nav-open');
+    const t = document.querySelector('.nav-toggle');
+    if (t) t.setAttribute('aria-expanded', 'false');
+  }
+  function setupMenu() {
+    const toggle = document.querySelector('.nav-toggle');
+    const close = document.querySelector('.nav-close');
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+    // If the viewport grows back to desktop, never leave the drawer state stuck.
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 760) closeMenu();
+    });
+  }
+
   function init() {
     PAGES.forEach((name) => {
       const el = document.querySelector('[data-page="' + name + '"]');
       if (el) pageEls.set(name, el);
     });
     NAV_PAGES.forEach((name) => {
-      const el = document.querySelector('nav [data-nav="' + name + '"]');
+      // Scope to .nav-links so 'home' resolves to the menu link, not the logo.
+      const el = document.querySelector('.nav-links [data-nav="' + name + '"]');
       if (el) navEls.set(name, el);
     });
+
+    setupMenu();
 
     // Delegate all in-app navigation.
     document.addEventListener('click', (e) => {
       const trigger = e.target.closest('[data-nav]');
       if (!trigger) return;
       e.preventDefault();
+      closeMenu();
       navigate(trigger.getAttribute('data-nav'));
     });
 
