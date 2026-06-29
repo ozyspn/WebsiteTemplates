@@ -20,7 +20,10 @@ python3 -m http.server 8000
 ## Pages
 
 A hash router (`app.js`) swaps between six views; links are deep-linkable and
-the browser back/forward buttons work:
+the browser back/forward buttons work. The top nav carries a **Home** link, and
+on narrow screens (≤760px) it collapses into a **hamburger menu** that opens a
+full-screen overlay with an **X** to close (also closes on Escape, on tapping a
+link, or when the viewport grows back to desktop).
 
 | Route        | View                                            |
 |--------------|-------------------------------------------------|
